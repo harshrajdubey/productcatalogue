@@ -1,11 +1,22 @@
+/* src/index.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body {
+  width: 100%;
+  margin: 0;
+}
+
+/* Root Variables for Light Mode */
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  color-scheme: light dark; /* Enable both light and dark modes */
+  color: rgba(0, 0, 0, 0.87); /* Default text color */
+  background-color: #ffffff; /* Default background for light mode */
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -13,28 +24,34 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Link Styling */
 a {
   font-weight: 500;
-  color: #646cff;
+  color: #646cff; /* Default link color */
   text-decoration: inherit;
 }
 a:hover {
-  color: #535bf2;
+  color: #535bf2; /* Hover color for links */
 }
 
+/* Body Styling */
 body {
   margin: 0;
   display: flex;
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  background-color: #ffffff; /* Light mode background */
+  color: rgba(0, 0, 0, 0.87); /* Light mode text color */
 }
 
+/* Heading Styling */
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
 }
 
+/* Button Styling */
 button {
   border-radius: 8px;
   border: 1px solid transparent;
@@ -42,7 +59,7 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  background-color: #ffffff; /* Light button background */
   cursor: pointer;
   transition: border-color 0.25s;
 }
@@ -54,15 +71,22 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+/* Dark Mode Specific Styles */
+body.dark {
+  background-color: #000000; /* Black background for dark mode */
+  color: #ffffff; /* White text color for dark mode */
+}
+
+button.dark {
+  background-color: #333333; /* Dark background for buttons */
+  color: #ffffff; /* Light text color for buttons in dark mode */
+  border-color: #646cff; /* Button border color in dark mode */
+}
+
+a.dark {
+  color: #a0a0ff; /* Dark mode link color */
+}
+
+a.dark:hover {
+  color: #7e7ef7; /* Dark mode link hover color */
 }
