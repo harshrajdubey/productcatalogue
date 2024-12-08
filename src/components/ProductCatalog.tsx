@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from "react";
+import React, { useEffect, useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../redux/store";
 import {
@@ -10,7 +10,16 @@ import {
   setCategory,
 } from "../redux/productSlice";
 import { Product } from "../types";
-import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
+import {
+  FaStar,
+  FaStarHalfAlt,
+  FaRegStar,
+  FaShoppingCart,
+  FaInfoCircle,
+  FaSun,
+  FaMoon,
+} from "react-icons/fa";
+import { FaFilter } from "react-icons/fa";
 
 const ProductCatalog: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -25,6 +34,9 @@ const ProductCatalog: React.FC = () => {
     sortBy,
     sortOrder,
   } = useSelector((state: RootState) => state.products);
+
+  const [darkMode, setDarkMode] = useState(false); // State for dark mode
+  const [showFilters, setShowFilters] = useState(false); // State for showing filters on mobile
 
   // Fetch products and set default sort order on mount
   useEffect(() => {
@@ -76,6 +88,23 @@ const ProductCatalog: React.FC = () => {
     );
   };
 
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode);
+  };
+
+  const toggleFilters = () => {
+    setShowFilters(!showFilters);
+  };
+
+  // Set dark mode on the root element
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [darkMode]);
+
   if (loading)
     return (
       <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50">
@@ -92,87 +121,140 @@ const ProductCatalog: React.FC = () => {
   console.log(filteredProducts);
 
   return (
-    <div className="mx-auto md:grid grid-cols-4 gap-6 p-6 absolute top-0 scroll-smooth">
-      {/* Sidebar */}
-      <div className="col-span-1 z-20 gap-4 mb-4 px-4 py-16 sticky border-r-2 h-screen top-0">
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={handleSearch}
-          placeholder="Search products"
-          className="w-full mb-4 p-2 border border-gray-300 rounded-xl bg-white text-black"
-        />
-        <div className="flex items-center space-x-4 mb-4">
-          <select
-            value={sortBy}
-            onChange={handleSortByChange}
-            className="p-2 border w-1/2 border-gray-300 rounded-xl bg-white text-black"
-          >
-            <option value="price">Sort by Price</option>
-            <option value="rating">Sort by Rating</option>
-          </select>
-          <select
-            value={sortOrder}
-            onChange={handleSortOrderChange}
-            className="p-2 border w-1/2 border-gray-300 rounded-xl bg-white text-black"
-          >
-            <option value="asc">Low To High</option>
-            <option value="desc">High To Low</option>
-          </select>
-        </div>
-        <div>
-          <h3 className="font-semibold mb-2">Categories</h3>
-          <ul className="space-y-2">
-            <li
-              key="all"
-              className={`cursor-pointer p-2 rounded-lg ${
-                selectedCategory === null
-                  ? "bg-red-500 text-white"
-                  : "hover:bg-gray-100"
-              }`}
-              onClick={() => handleCategoryChange(null)}
-            >
-              All Products
-            </li>
-            {categories.map((category) => (
-              <li
-                key={category}
-                className={`capitalize cursor-pointer p-2 rounded-lg ${
-                  selectedCategory === category
-                    ? "bg-red-500 text-white"
-                    : "hover:bg-gray-100"
-                }`}
-                onClick={() => handleCategoryChange(category)}
-              >
-                {category}
-              </li>
-            ))}
-          </ul>
-        </div>
+    <div
+      className={` transition duration-300 ease-in-out dark:bg-gray-800 dark:border-gray-700 h-[90vh] ${
+        darkMode ? "bg-black text-white" : "bg-white text-black"
+      }`}
+    >
+      <div className="flex justify-end items-center align-middle absolute top-4 right-4">
+        <button
+          onClick={toggleFilters}
+          className="p-2 z-50 flex md:hidden items-center align-middle mr-2 gap-2 dark:bg-white dark:text-black bg-gray-800 text-white rounded-full"
+        >
+          <FaFilter />
+          {showFilters ? "Hide Filter" : "Show Filter"}
+        </button>
+        <button
+          onClick={toggleDarkMode}
+          className="p-2 z-50 flex gap-2 align-middle items-center dark:bg-white dark:text-black bg-gray-800 text-white rounded-full"
+        >
+          {darkMode ? (
+            <FaSun className="text-yellow-500" />
+          ) : (
+            <FaMoon className="text-white" />
+          )}
+
+          {darkMode ? "Light Mode" : "Dark Mode"}
+        </button>
       </div>
 
-      {/* Product Grid */}
-      <div className="col-span-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {filteredProducts.map((product: Product) => (
-          <div
-            key={product.id}
-            className="bg-white border rounded-xl shadow-xl p-4 hover:scale-110 transform transition duration-300 ease-in-out"
-          >
-            <img
-              src={product.image}
-              alt={product.title}
-              className="w-full h-56 max-h-56 mx-auto object-contain rounded-md mb-4"
-            />
-            <h3 className="text-xl font-bold truncate">{product.title}</h3>
-            <div className="flex items-center justify-between mt-2">
-              <p className="text-black text-lg font-semibold">${Math.round(product.price*100)/100}</p>
-              <div className="flex flex-col items-center ">
-                {renderStars(product.rating.rate)} {/* Display stars */}
-                ({product.rating.count} Reviews)
+      <div className="mx-auto md:grid grid-cols-4 gap-6 px-4 md:p-6  absolute top-0 scroll-smooth transition duration-300 ease-in-out dark:bg-gray-800 dark:border-gray-700">
+        <div
+          className={`border-none dark:bg-gray-800 dark:text-white my-0 gap-4 md:sticky z-20 col-span-1 pt-16 md:py-16 border-r-2 md:h-screen top-0 mb-4 px-4 ${
+            showFilters ? "block" : "hidden md:block"
+          }`}
+        >
+          {/* Filter icon for mobile */}
+
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={handleSearch}
+            placeholder="Search products"
+            className="w-full mb-4 p-2 border border-gray-300 rounded-xl bg-white text-black dark:bg-gray-900 dark:text-white"
+          />
+          <div className="flex items-center space-x-4 mb-4">
+            <select
+              value={sortBy}
+              onChange={handleSortByChange}
+              className="p-2 border w-1/2 border-gray-300 rounded-xl bg-white text-black dark:bg-gray-900 dark:text-white"
+            >
+              <option value="price">Sort by Price</option>
+              <option value="rating">Sort by Rating</option>
+            </select>
+            <select
+              value={sortOrder}
+              onChange={handleSortOrderChange}
+              className="p-2 border w-1/2 border-gray-300 rounded-xl bg-white text-black dark:bg-gray-900 dark:text-white"
+            >
+              <option value="asc">Low To High</option>
+              <option value="desc">High To Low</option>
+            </select>
+          </div>
+          <div>
+            <h3 className="font-semibold mb-2">Categories</h3>
+            <ul className="space-y-2">
+              <li
+                key="all"
+                className={`cursor-pointer p-2 rounded-lg ${
+                  selectedCategory === null
+                    ? "bg-red-500 text-white"
+                    : "hover:bg-red-500 hover:text-white bg-gray-100 dark:hover:bg-red-500 dark:bg-gray-900"
+                }`}
+                onClick={() => handleCategoryChange(null)}
+              >
+                All Products
+              </li>
+              {categories.map((category) => (
+                <li
+                  key={category}
+                  className={`capitalize cursor-pointer p-2 rounded-lg ${
+                    selectedCategory === category
+                      ? "bg-red-500 text-white"
+                      : "hover:bg-red-500 hover:text-white bg-gray-100 dark:hover:bg-red-500 dark:bg-gray-900"
+                  }`}
+                  onClick={() => handleCategoryChange(category)}
+                >
+                  {category}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        {/* Product Grid */}
+        <div className="col-span-3 p-0 md:p-4 md:pt-14 pt-16 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 transition duration-300 ease-in-out dark:bg-gray-800 dark:border-gray-700">
+          {filteredProducts.map((product: Product) => (
+            <div
+              key={product.id}
+              className="h-[28rem] bg-white border rounded-xl shadow-xl p-4 hover:scale-105 transform transition duration-300 ease-in-out dark:bg-gray-900 dark:border-gray-700"
+            >
+              <img
+                src={product.image}
+                alt={product.title}
+                className="w-full h-48 max-h-48 mx-auto object-contain rounded-md mb-4"
+              />
+              <h3 className="text-xl font-bold truncate">{product.title}</h3>
+              <div className="flex items-center justify-between my-2">
+                <p className="text-lg font-semibold">
+                  ${Math.round(product.price * 100) / 100}
+                </p>
+                <div className="flex flex-col items-center ">
+                  {renderStars(product.rating.rate)} {/* Display stars */}(
+                  {product.rating.count} Reviews)
+                </div>
+              </div>
+              <p className="text-base text-justify line-clamp-[3]">
+                {product.description}
+              </p>
+
+              <div className="absolute bottom-4 right-4 flex gap-2">
+                <button className="group border border-black text-black bg-green-200 text-sm p-2 rounded-full flex items-center gap-1 hover:bg-green-300">
+                  <FaShoppingCart />
+                  <span className="hidden group-hover:inline-block">
+                    Add To Cart
+                  </span>
+                </button>
+                <button className="group border border-black text-black bg-blue-200 text-sm p-2 rounded-full flex items-center gap-1 hover:bg-blue-300">
+                  <FaInfoCircle />
+                  <span className="hidden group-hover:inline-block">
+                    View Details
+                  </span>
+                </button>
               </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   );

@@ -3,7 +3,8 @@
 @tailwind components;
 @tailwind utilities;
 
-html, body {
+html,
+body {
   width: 100%;
   margin: 0;
 }
@@ -16,7 +17,6 @@ html, body {
 
   color-scheme: light dark; /* Enable both light and dark modes */
   color: rgba(0, 0, 0, 0.87); /* Default text color */
-  background-color: #ffffff; /* Default background for light mode */
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -41,8 +41,8 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
-  background-color: #ffffff; /* Light mode background */
   color: rgba(0, 0, 0, 0.87); /* Light mode text color */
+  background-color: #ffffff; /* Light mode background */
 }
 
 /* Heading Styling */
@@ -73,20 +73,33 @@ button:focus-visible {
 
 /* Dark Mode Specific Styles */
 body.dark {
-  background-color: #000000; /* Black background for dark mode */
-  color: #ffffff; /* White text color for dark mode */
+  background-color: #1a1a1a; /* Dark background for dark mode */
+  color: #e0e0e0; /* Light text color for dark mode */
 }
 
-button.dark {
+body.dark a {
+  color: #a0a0ff; /* Dark mode link color */
+}
+
+body.dark a:hover {
+  color: #7e7ef7; /* Dark mode link hover color */
+}
+
+body.dark button {
   background-color: #333333; /* Dark background for buttons */
   color: #ffffff; /* Light text color for buttons in dark mode */
   border-color: #646cff; /* Button border color in dark mode */
 }
 
-a.dark {
-  color: #a0a0ff; /* Dark mode link color */
+body.dark h1 {
+  color: #ffffff; /* Light color for heading in dark mode */
 }
 
-a.dark:hover {
-  color: #7e7ef7; /* Dark mode link hover color */
+body.dark p,
+body.dark h2,
+body.dark h3,
+body.dark h4,
+body.dark h5,
+body.dark h6 {
+  color: #e0e0e0; /* Light text color for paragraphs and headings in dark mode */
 }
