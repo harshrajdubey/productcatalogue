@@ -24,7 +24,7 @@ import { FaFilter } from "react-icons/fa";
 
 const ProductCatalog: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
-  
+
   const {
     products,
     filteredProducts,
@@ -244,8 +244,8 @@ const ProductCatalog: React.FC = () => {
                   ${Math.round(product.price * 100) / 100}
                 </p>
                 <div className="flex flex-col items-center">
-                  {renderStars(product.rating.rate)} {/* Display stars */}
-                  ({product.rating.count} Reviews)
+                  {renderStars(product.rating.rate)} {/* Display stars */}(
+                  {product.rating.count} Reviews)
                 </div>
               </div>
               <p className="text-base text-justify line-clamp-[3]">
@@ -269,38 +269,36 @@ const ProductCatalog: React.FC = () => {
             </div>
           ))}
 
-             {/* Pagination */}
-      <div className="col-span-1 md:col-span-4 flex justify-center py-4">
-        <button
-          className={`px-4 py-2 mx-2 border rounded-full ${
-            currentPage === 1
-              ? "bg-gray-400 text-gray-700 cursor-not-allowed"
-              : "bg-blue-500 text-white"
-          }`}
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-        >
-          Previous
-        </button>
-        <span className="flex items-center justify-center px-4">
-          Page {currentPage} of {totalPages}
-        </span>
-        <button
-          className={`px-4 py-2 mx-2 border rounded-full ${
-            currentPage === totalPages
-              ? "bg-gray-400 text-gray-700 cursor-not-allowed"
-              : "bg-blue-500 text-white"
-          }`}
-          onClick={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-        >
-          Next
-        </button>
-      </div>
+          {/* Pagination */}
+          <div className="col-span-1 md:col-span-4 flex justify-center py-4 h-20" >
+            <button
+              className={`px-4 py-2 mx-2 border rounded-full ${
+                currentPage === 1
+                  ? "bg-gray-400 text-gray-700 cursor-not-allowed"
+                  : "bg-blue-500 text-white"
+              }`}
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+            >
+              Previous
+            </button>
+            <span className="flex items-center justify-center px-4">
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              className={`px-4 py-2 mx-2 border rounded-full ${
+                currentPage === totalPages
+                  ? "bg-gray-400 text-gray-700 cursor-not-allowed"
+                  : "bg-blue-500 text-white"
+              }`}
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+            >
+              Next
+            </button>
+          </div>
         </div>
       </div>
-
-   
     </div>
   );
 };
