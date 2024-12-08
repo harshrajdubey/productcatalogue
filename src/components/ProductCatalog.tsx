@@ -8,6 +8,7 @@ import {
   setSortOrder,
   sortProducts,
   setCategory,
+  setCurrentPage,
 } from "../redux/productSlice";
 import { Product } from "../types";
 import {
@@ -23,6 +24,7 @@ import { FaFilter } from "react-icons/fa";
 
 const ProductCatalog: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
+  
   const {
     products,
     filteredProducts,
@@ -33,6 +35,8 @@ const ProductCatalog: React.FC = () => {
     searchQuery,
     sortBy,
     sortOrder,
+    currentPage,
+    itemsPerPage,
   } = useSelector((state: RootState) => state.products);
 
   const [darkMode, setDarkMode] = useState(false); // State for dark mode
@@ -70,6 +74,12 @@ const ProductCatalog: React.FC = () => {
     dispatch(setCategory(category));
   };
 
+  const handlePageChange = (page: number) => {
+    if (page > 0 && page <= Math.ceil(filteredProducts.length / itemsPerPage)) {
+      dispatch(setCurrentPage(page));
+    }
+  };
+
   const renderStars = (rating: number) => {
     const fullStars = Math.floor(rating);
     const halfStar = rating % 1 >= 0.5;
@@ -105,6 +115,12 @@ const ProductCatalog: React.FC = () => {
     }
   }, [darkMode]);
 
+  // Pagination: Slice filteredProducts to show only items for the current page
+  const currentPageProducts = filteredProducts.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
   if (loading)
     return (
       <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50">
@@ -118,7 +134,7 @@ const ProductCatalog: React.FC = () => {
 
   if (error) return <div>Error: {error}</div>;
 
-  console.log(filteredProducts);
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
 
   return (
     <div
@@ -154,8 +170,6 @@ const ProductCatalog: React.FC = () => {
             showFilters ? "block" : "hidden md:block"
           }`}
         >
-          {/* Filter icon for mobile */}
-
           <input
             type="text"
             value={searchQuery}
@@ -214,7 +228,7 @@ const ProductCatalog: React.FC = () => {
 
         {/* Product Grid */}
         <div className="col-span-3 p-0 md:p-4 md:pt-14 pt-16 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 transition duration-300 ease-in-out dark:bg-gray-800 dark:border-gray-700">
-          {filteredProducts.map((product: Product) => (
+          {currentPageProducts.map((product: Product) => (
             <div
               key={product.id}
               className="h-[28rem] bg-white border rounded-xl shadow-xl p-4 hover:scale-105 transform transition duration-300 ease-in-out dark:bg-gray-900 dark:border-gray-700"
@@ -229,9 +243,9 @@ const ProductCatalog: React.FC = () => {
                 <p className="text-lg font-semibold">
                   ${Math.round(product.price * 100) / 100}
                 </p>
-                <div className="flex flex-col items-center ">
-                  {renderStars(product.rating.rate)} {/* Display stars */}(
-                  {product.rating.count} Reviews)
+                <div className="flex flex-col items-center">
+                  {renderStars(product.rating.rate)} {/* Display stars */}
+                  ({product.rating.count} Reviews)
                 </div>
               </div>
               <p className="text-base text-justify line-clamp-[3]">
@@ -248,16 +262,47 @@ const ProductCatalog: React.FC = () => {
                 <button className="group border border-black text-black bg-blue-200 text-sm p-2 rounded-full flex items-center gap-1 hover:bg-blue-300">
                   <FaInfoCircle />
                   <span className="hidden group-hover:inline-block">
-                    View Details
+                    Product Info
                   </span>
                 </button>
               </div>
             </div>
           ))}
+
+             {/* Pagination */}
+      <div className="col-span-1 md:col-span-4 flex justify-center py-4">
+        <button
+          className={`px-4 py-2 mx-2 border rounded-full ${
+            currentPage === 1
+              ? "bg-gray-400 text-gray-700 cursor-not-allowed"
+              : "bg-blue-500 text-white"
+          }`}
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+        >
+          Previous
+        </button>
+        <span className="flex items-center justify-center px-4">
+          Page {currentPage} of {totalPages}
+        </span>
+        <button
+          className={`px-4 py-2 mx-2 border rounded-full ${
+            currentPage === totalPages
+              ? "bg-gray-400 text-gray-700 cursor-not-allowed"
+              : "bg-blue-500 text-white"
+          }`}
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+        >
+          Next
+        </button>
+      </div>
         </div>
       </div>
+
+   
     </div>
   );
 };
 
-export default React.memo(ProductCatalog);
+export default ProductCatalog;

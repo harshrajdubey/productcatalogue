@@ -4,32 +4,35 @@ import { Product } from '../types';
 interface ProductState {
   products: Product[];
   filteredProducts: Product[];
-  categories: string[]; // Store unique categories
-  selectedCategory: string | null; // Track selected category for filtering
+  categories: string[];
+  selectedCategory: string | null;
   searchQuery: string;
   loading: boolean;
   error: string | null;
   sortBy: 'price' | 'rating';
   sortOrder: 'asc' | 'desc';
+  currentPage: number;
+  itemsPerPage: number;
 }
 
 const initialState: ProductState = {
   products: [],
   filteredProducts: [],
-  categories: [], // Initialize categories as empty
-  selectedCategory: null, // No category selected initially
+  categories: [],
+  selectedCategory: null,
   loading: false,
   error: null,
   searchQuery: '',
-  sortBy: 'rating', // Default sort by rating
-  sortOrder: 'desc', // Default sort order is descending
+  sortBy: 'rating',
+  sortOrder: 'desc',
+  currentPage: 1,
+  itemsPerPage: 12, // Number of items per page
 };
 
-// Define the async thunk for fetching products
 export const fetchProducts = createAsyncThunk<Product[]>(
   'products/fetchProducts',
   async () => {
-    const response = await fetch('https://fakestoreapi.com/products'); // Replace with your API URL
+    const response = await fetch('https://fakestoreapi.com/products');
     const data = await response.json();
     return data;
   }
@@ -81,23 +84,23 @@ const productSlice = createSlice({
         new Set(state.products.map((product) => product.category))
       );
     },
+    setCurrentPage(state, action: PayloadAction<number>) {
+      state.currentPage = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
       .addCase(fetchProducts.pending, (state) => {
         state.loading = true;
       })
-      .addCase(
-        fetchProducts.fulfilled,
-        (state, action: PayloadAction<Product[]>) => {
-          state.loading = false;
-          state.products = action.payload;
-          state.filteredProducts = action.payload;
-          state.categories = Array.from(
-            new Set(action.payload.map((product) => product.category))
-          ); // Extract categories on fetch
-        }
-      )
+      .addCase(fetchProducts.fulfilled, (state, action: PayloadAction<Product[]>) => {
+        state.loading = false;
+        state.products = action.payload;
+        state.filteredProducts = action.payload;
+        state.categories = Array.from(
+          new Set(action.payload.map((product) => product.category))
+        );
+      })
       .addCase(fetchProducts.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || 'Failed to fetch products';
@@ -112,6 +115,7 @@ export const {
   sortProducts,
   setCategory,
   extractCategories,
+  setCurrentPage,
 } = productSlice.actions;
 
 export default productSlice.reducer;
