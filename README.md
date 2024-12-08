@@ -16,7 +16,6 @@ This is a simple and responsive product catalog built with React and Vite. The c
 You can try the live demo at the following URLs:
 
 - [Product Catalog - Vercel](https://productcatalogue-navy.vercel.app/)
-- [Product Catalog - Replit](https://9e3995af-8abb-4de8-bf1c-41fcfd010d2b-00-1kxb0b1gy12k8.sisko.replit.dev/)
 
 ## Installation
 
