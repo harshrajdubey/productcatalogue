@@ -270,7 +270,7 @@ const ProductCatalog: React.FC = () => {
           ))}
 
           {/* Pagination */}
-          <div className="col-span-1 md:col-span-4 flex justify-center py-4 h-20" >
+          <div className="col-span-1 md:col-span-4 flex justify-center items-center py-4 h-20">
             <button
               className={`px-4 py-2 mx-2 border rounded-full ${
                 currentPage === 1
