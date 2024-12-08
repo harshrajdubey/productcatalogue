@@ -7,6 +7,7 @@ import {
   setSortBy,
   setSortOrder,
   sortProducts,
+  setCategory,
 } from "../redux/productSlice";
 import { Product } from "../types";
 import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
@@ -16,6 +17,8 @@ const ProductCatalog: React.FC = () => {
   const {
     products,
     filteredProducts,
+    categories,
+    selectedCategory,
     loading,
     error,
     searchQuery,
@@ -23,15 +26,15 @@ const ProductCatalog: React.FC = () => {
     sortOrder,
   } = useSelector((state: RootState) => state.products);
 
-  // Set default sort on component mount
+  // Fetch products and set default sort order on mount
   useEffect(() => {
-    dispatch(setSortBy("rating")); // Default to sorting by rating
-    dispatch(setSortOrder("desc")); // Default to descending order
     dispatch(fetchProducts());
+    dispatch(setSortBy("rating"));
+    dispatch(setSortOrder("desc"));
   }, [dispatch]);
 
   useEffect(() => {
-    dispatch(sortProducts()); // Sort whenever `sortBy` or `sortOrder` changes
+    dispatch(sortProducts());
   }, [dispatch, sortBy, sortOrder]);
 
   const handleSearch = useCallback(
@@ -51,6 +54,10 @@ const ProductCatalog: React.FC = () => {
     dispatch(setSortOrder(event.target.value as "asc" | "desc"));
   };
 
+  const handleCategoryChange = (category: string | null) => {
+    dispatch(setCategory(category));
+  };
+
   const renderStars = (rating: number) => {
     const fullStars = Math.floor(rating);
     const halfStar = rating % 1 >= 0.5;
@@ -59,9 +66,9 @@ const ProductCatalog: React.FC = () => {
     return (
       <div className="flex items-center">
         {[...Array(fullStars)].map((_, index) => (
-          <FaStar key={`full-${index}`} className="text-yellow-500" />
+          <FaStar key={`full-${index}`} className="text-red-500" />
         ))}
-        {halfStar && <FaStarHalfAlt className="text-yellow-500" />}
+        {halfStar && <FaStarHalfAlt className="text-red-500" />}
         {[...Array(emptyStars)].map((_, index) => (
           <FaRegStar key={`empty-${index}`} className="text-gray-300" />
         ))}
@@ -82,17 +89,20 @@ const ProductCatalog: React.FC = () => {
 
   if (error) return <div>Error: {error}</div>;
 
+  console.log(filteredProducts);
+
   return (
-    <div className="mx-auto p-6">
-      <div className="md:flex items-center gap-4 justify-between mb-4">
+    <div className="mx-auto md:grid grid-cols-4 gap-6 p-6 absolute top-0 scroll-smooth">
+      {/* Sidebar */}
+      <div className="col-span-1 z-20 gap-4 mb-4 px-4 py-16 sticky border-r-2 h-screen top-0">
         <input
           type="text"
           value={searchQuery}
           onChange={handleSearch}
           placeholder="Search products"
-          className="w-full mb-4 md:mb-0 p-2 border border-gray-300 rounded-xl bg-white text-black"
+          className="w-full mb-4 p-2 border border-gray-300 rounded-xl bg-white text-black"
         />
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-4 mb-4">
           <select
             value={sortBy}
             onChange={handleSortByChange}
@@ -110,22 +120,57 @@ const ProductCatalog: React.FC = () => {
             <option value="desc">High To Low</option>
           </select>
         </div>
+        <div>
+          <h3 className="font-semibold mb-2">Categories</h3>
+          <ul className="space-y-2">
+            <li
+              key="all"
+              className={`cursor-pointer p-2 rounded-lg ${
+                selectedCategory === null
+                  ? "bg-red-500 text-white"
+                  : "hover:bg-gray-100"
+              }`}
+              onClick={() => handleCategoryChange(null)}
+            >
+              All Products
+            </li>
+            {categories.map((category) => (
+              <li
+                key={category}
+                className={`capitalize cursor-pointer p-2 rounded-lg ${
+                  selectedCategory === category
+                    ? "bg-red-500 text-white"
+                    : "hover:bg-gray-100"
+                }`}
+                onClick={() => handleCategoryChange(category)}
+              >
+                {category}
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      {/* Product Grid */}
+      <div className="col-span-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {filteredProducts.map((product: Product) => (
           <div
             key={product.id}
-            className="bg-white border rounded-xl shadow-xl p-4"
+            className="bg-white border rounded-xl shadow-xl p-4 hover:scale-110 transform transition duration-300 ease-in-out"
           >
             <img
               src={product.image}
               alt={product.title}
-              className="w-auto h-56 mx-auto object-cover rounded-md mb-4"
+              className="w-full h-56 max-h-56 mx-auto object-contain rounded-md mb-4"
             />
-            <h3 className="text-lg font-semibold truncate">{product.title}</h3>
-            <p className="text-gray-600">${product.price}</p>
-            {renderStars(product.rating.rate)} {/* Display stars */}
+            <h3 className="text-xl font-bold truncate">{product.title}</h3>
+            <div className="flex items-center justify-between mt-2">
+              <p className="text-black text-lg font-semibold">${Math.round(product.price*100)/100}</p>
+              <div className="flex flex-col items-center ">
+                {renderStars(product.rating.rate)} {/* Display stars */}
+                ({product.rating.count} Reviews)
+              </div>
+            </div>
           </div>
         ))}
       </div>
